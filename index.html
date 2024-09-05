@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>本日の当番医</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .medical {
+        color: #888;
+        font-size: 20px;
+        margin-bottom: 5px;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin: 0 0 5px 0;
+      }
+
+      .time {
+        font-size: 14px;
+        color: #333;
+        margin: 0 0 10px 0;
+      }
+
+      .info {
+        display: flex;
+        align-items: center;
+      }
+
+      .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        background-color: #ddd;
+      }
+
+      .address,
+      .phone {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section></section>
+
+      <script>
+        fetch(
+          "data.json"
+        )
+          .then((response) => response.json())
+          .then((jsonData) => {
+            let today = new Date();
+            let tomorrow = new Date();
+
+            tomorrow.setHours(tomorrow.getHours() + 10);
+
+            let todayDate = today.toISOString().split("T")[0];
+            let tomorrowDate = tomorrow.toISOString().split("T")[0];
+
+            let filteredData = jsonData.filter(
+              (entry) => entry.date === todayDate || entry.date === tomorrowDate
+            );
+
+            let mainElement = document.querySelector("section");
+
+            filteredData.forEach((dateData) => {
+              let subhead = document.createElement("h1");
+              subhead.classList.add("date");
+
+              subhead.textContent = dateData.date_week;
+              mainElement.appendChild(subhead);
+
+              dateData.hospital.forEach((hospital) => {
+                let cardWrap = document.createElement("div");
+                cardWrap.classList.add("card");
+
+                let card = `
+                    <div class="medical">${hospital.medical}</div>
+                    <h2><a href="${hospital.link}">${hospital.name}</a></h2>
+                    <p class="time">${hospital.time}</p>
+                    <div class="info">
+                        <div class="icon"></div>
+                        <div><p class="address"><a href="${hospital.navi}">${hospital.address}</a></p><p class="phone"><a href="tel:${hospital.daytime}">${hospital.daytime}</a></p></div>
+                    </div>
+                    `;
+
+                cardWrap.innerHTML = card;
+                mainElement.appendChild(cardWrap);
+              });
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching the JSON data:", error);
+          });
+      </script>
+    </div>
+  </body>
+</html>
